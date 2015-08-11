@@ -45,7 +45,12 @@ root@accumulo mytable> exit
 
 #### run the spark shell
 
+```
 spark-shell --master yarn-client --driver-memory 1g --executor-memory 1g --executor-cores 1
+```
 
 #### execute the the following command which should return 1000
+
+```
 scala> sc.parallelize(1 to 1000).count()
+```
