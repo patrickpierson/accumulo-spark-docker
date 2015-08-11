@@ -1,6 +1,6 @@
 FROM sequenceiq/hadoop-docker
 
-MAINTAINER @mraad <mraad@esri.com>
+MAINTAINER ppierson@bericotechnologies.com
 
 USER root
 
@@ -44,13 +44,9 @@ RUN $BOOTSTRAP && $HADOOP_PREFIX/bin/hadoop dfsadmin -safemode leave && $HADOOP_
 ENV YARN_CONF_DIR $HADOOP_PREFIX/etc/hadoop
 ENV PATH $PATH:$SPARK_HOME/bin:$HADOOP_PREFIX/bin
 # update boot script
-COPY bootstrap.sh /etc/bootstrap.sh
-RUN chown root.root /etc/bootstrap.sh
-RUN chmod 700 /etc/bootstrap.sh
+COPY spark-bootstrap.sh /etc/spark-bootstrap.sh
+RUN chown root.root /etc/spark-bootstrap.sh
+RUN chmod 700 /etc/spark-bootstrap.sh
 
-#install R
-RUN rpm -ivh http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
-RUN yum -y install R
-
-ENTRYPOINT ["/etc/bootstrap.sh"]
+ENTRYPOINT ["/etc/spark-bootstrap.sh"]
 EXPOSE 2181 8042 8088 9000 50095

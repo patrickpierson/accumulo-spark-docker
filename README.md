@@ -1,73 +1,20 @@
-## Single Node [Accumulo](https://accumulo.apache.org/) Instance On Docker
-
-This work is based on [https://github.com/medined/docker-accumulo](https://github.com/medined/docker-accumulo) - Thanks :-)
-
-If you are using [boot2docker](http://boot2docker.io/), then you might want to up the memory and storage space.
-
-```shell
-boot2docker init -m 8192 -s 32768
-```
-
-On Windows, the `C:` drive is mounted on the linux host as `/c`. Copy this folder onto your `C:` drive so you can `cd /c/accumulo-docker`
-
-### vm.swappiness and docker
-
-The `vm.swappiness` system parameter has to be set in the docker host OS to be inherited by the Accumulo container.
-
-If you are using boot2docker then `boot2docker ssh` to login to the host OS.
-
-```shell
-sudo sysctl -w vm.swappiness=0
-sudo sysctl -w net.ipv6.conf.lo.disable_ipv6=1
-sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1
-sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1
-```
-
-Check the value using:
-```shell
-sysctl vm.swappiness
-```
-
 ### Build the container image
 
 ```shell
-docker build -t mraad/accumulo .
+docker build -t username/accumulo-spark github.com/ppiersonbt/accumulo-spark-docker.git
 ```
 
 ### Run the container
 
 ```shell
-docker run --name accumulo -i -t -P mraad/accumulo /bin/bash
-```
-
-### Start Zookeeper, YARN, HDFS and Accumulo
-
-```shell
-/etc/start-all.sh
-```
-
-### Stop Accumulo, HDFS, YARN and Zookeeper
-
-```shell
-/etc/stop-all.sh
+docker run --name accumulo-spark -i -t -P username/accumulo-spark /bin/bash
 ```
 
 ### See all exposed ports
 
 ```shell
-docker port accumulo | sort -t / -n
+docker port accumulo-spark | sort -t / -n
 ```
-
-
-In this line sample `50070/tcp -> 0.0.0.0:49161`, the internal port `50070` is mapped to `49161` on the host OS.
-
-If you are using boot2docker, get the host OS IP using `boot2docker ip`
-
-SERVICE  |URL                             |
----------|--------------------------------|
-YARN     | http://docker-ip:exposed-8088  |
-HDFS     | http://docker-ip:exposed-50070 |
-ACCUMULO | http://docker-ip:exposed-50095 |
 
 
 ### Sample Accumulo session in the container
@@ -94,8 +41,11 @@ row1 colf:colq []    value1
 root@accumulo mytable> exit
 ```
 
-### Extra References
+### Sample Spark session in the container
 
-* http://stackoverflow.com/questions/25767224/change-swappiness-for-docker-container
-* http://en.wikipedia.org/wiki/Swappiness
-* http://www.incrediblemolk.com/sharing-a-windows-folder-with-the-boot2docker-vm/
+#### run the spark shell
+
+spark-shell --master yarn-client --driver-memory 1g --executor-memory 1g --executor-cores 1
+
+#### execute the the following command which should return 1000
+scala> sc.parallelize(1 to 1000).count()
